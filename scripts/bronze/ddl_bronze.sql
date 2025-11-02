@@ -36,7 +36,7 @@ create table bronze.crm_prd_info (
     prd_nm nvarchar(50),
     prd_cost int,
     prd_line nvarchar(50),
-    prd_start_dt nvarchar(50),
+    prd_start_dt date,
     prd_end_dt date
 );
 go
