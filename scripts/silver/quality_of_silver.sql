@@ -1,4 +1,5 @@
---silver.crm_cust_info
+--============================================================================================
+--============================================================================================--silver.crm_cust_info
 -- check for nulls or duplicates in primary key
 select
 cst_id,
@@ -18,10 +19,8 @@ where cst_firstname != trim(cst_firstname)
 select
 distinct cst_gndr
 from silver.crm_cust_info
-
-
-
-------------------------------------------------------
+--============================================================================================
+--============================================================================================
 --silver.crm_prd_info
 -- check for nulls or duplicates in primary key
 select
@@ -53,3 +52,118 @@ select
 *
 from silver.crm_prd_info
 where prd_end_dt < prd_start_dt
+--============================================================================================
+--============================================================================================
+--silver.crm_sales_details
+select top 2 * from silver.crm_sales_details
+
+-- check for nulls
+select 
+*
+from bronze.crm_sales_details
+where sls_order_dt is null
+
+select
+*
+from silver.crm_sales_details
+where sls_cust_id not in (select cst_id from silver.crm_cust_info)
+
+-- check for unwanted spaces
+select 
+*
+from silver.crm_sales_details
+where sls_prd_key != trim(sls_prd_key)
+
+
+--check for invalid date 
+select 
+nullif(sls_order_dt, 0) as sls_order_dt
+from bronze.crm_sales_details
+where sls_order_dt <= 0 or 
+	len(sls_order_dt) != 8 or 
+	sls_order_dt >20500101 or 
+	sls_order_dt < 19000101
+
+--check for invalid date orders
+select 
+*
+from silver.crm_sales_details
+where (sls_ship_dt < sls_order_dt) or  (sls_due_dt < sls_ship_dt)
+
+
+-- Data Consistency: sales, quantity, price
+-- sales = quantity * sales
+select 
+sls_sales,
+sls_quantity,
+sls_price
+from silver.crm_sales_details
+where sls_sales != sls_quantity * sls_price
+or sls_sales is null or sls_quantity is null or sls_price is null
+or sls_sales <= 0 or sls_quantity  <= 0 or sls_price  <= 0
+order by sls_sales, sls_quantity,sls_price
+--============================================================================================
+--============================================================================================
+--silver.erp_CUST_AZ12
+-- check for nulls
+select
+*
+from silver.erp_CUST_AZ12
+where CID is null
+-- check for unwanted spaces
+select
+*
+from silver.erp_CUST_AZ12
+where CID != trim(CID)
+
+--Identify out of range dates
+select
+*
+from silver.erp_CUST_AZ12
+where bdate >  getdate()
+
+--data standardization and consistency
+select
+distinct GEN
+from silver.erp_CUST_AZ12
+--============================================================================================
+--============================================================================================
+----silver.erp_LOC_A101
+-- check for nulls
+select
+*
+from silver.erp_LOC_A101
+where CID is null
+
+--data standardization and consistency
+select
+distinct
+CNTRY as old_cntry,
+case
+	when upper(trim(CNTRY)) = 'DE' then 'Germany'
+	when upper(trim(CNTRY)) in ('US', 'USA') then 'United States'
+	when trim(CNTRY) = '' or CNTRY is null then 'n/a'
+	else trim(CNTRY)
+end as CNTRY
+from silver.erp_LOC_A101
+--============================================================================================
+--============================================================================================
+--silver.erp_PX_CAT_G1V2
+-- check for nulls
+select
+*
+from silver.erp_PX_CAT_G1V2
+where ID is null or CAT is null or SUBCAT is null
+
+--check for unwanted spaces
+select
+*
+from silver.erp_PX_CAT_G1V2
+where ID != trim(ID) or CAT != trim(CAT) or SUBCAT != trim(SUBCAT) or MAINTENANCE != trim(MAINTENANCE)
+
+
+--data standardization and consistency
+select 
+distinct
+MAINTENANCE
+from silver.erp_PX_CAT_G1V2

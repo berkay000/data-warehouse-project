@@ -1,0 +1,60 @@
+# SQL Data Warehouse - Git Ignore File
+
+# Quality check files
+scripts/silver/quality_of_silver.sql
+
+# IDE and Editor files
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# SQL Server files
+*.mdf
+*.ldf
+*.ndf
+*.bak
+*.trn
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Visual Studio files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Placeholder files (if needed)
+# Uncomment if you want to ignore placeholder files
+# **/placeholder
+
