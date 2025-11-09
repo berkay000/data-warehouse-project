@@ -1,5 +1,25 @@
+/*
+===============================================================================
+Quality Checks
+===============================================================================
+Script Purpose:
+    This script performs various quality checks for data consistency, accuracy, 
+    and standardization across the 'silver' layer. It includes checks for:
+    - Null or duplicate primary keys.
+    - Unwanted spaces in string fields.
+    - Data standardization and consistency.
+    - Invalid date ranges and orders.
+    - Data consistency between related fields.
+
+Usage Notes:
+    - Run these checks after data loading Silver Layer.
+    - Investigate and resolve any discrepancies found during the checks.
+===============================================================================
+*/
+
 --============================================================================================
---============================================================================================--silver.crm_cust_info
+--============================================================================================
+-- silver.crm_cust_info
 -- check for nulls or duplicates in primary key
 select
 cst_id,
@@ -55,18 +75,14 @@ where prd_end_dt < prd_start_dt
 --============================================================================================
 --============================================================================================
 --silver.crm_sales_details
-select top 2 * from silver.crm_sales_details
-
--- check for nulls
+-- check for invalid dates
 select 
-*
+    nullif(sls_due_dt, 0) as sls_due_dt 
 from bronze.crm_sales_details
-where sls_order_dt is null
-
-select
-*
-from silver.crm_sales_details
-where sls_cust_id not in (select cst_id from silver.crm_cust_info)
+where sls_due_dt <= 0 
+    or LEN(sls_due_dt) != 8 
+    or sls_due_dt > 20500101 
+    or sls_due_dt < 19000101;
 
 -- check for unwanted spaces
 select 
@@ -74,15 +90,6 @@ select
 from silver.crm_sales_details
 where sls_prd_key != trim(sls_prd_key)
 
-
---check for invalid date 
-select 
-nullif(sls_order_dt, 0) as sls_order_dt
-from bronze.crm_sales_details
-where sls_order_dt <= 0 or 
-	len(sls_order_dt) != 8 or 
-	sls_order_dt >20500101 or 
-	sls_order_dt < 19000101
 
 --check for invalid date orders
 select 

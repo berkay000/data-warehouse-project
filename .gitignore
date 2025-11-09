@@ -1,7 +1,6 @@
 # SQL Data Warehouse - Git Ignore File
 
-# Quality check files
-scripts/silver/quality_of_silver.sql
+
 
 # IDE and Editor files
 .vs/
